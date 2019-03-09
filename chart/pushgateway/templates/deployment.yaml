@@ -1,0 +1,28 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: "{{ .Chart.Name }}"
+  labels:
+    app: "{{ .Chart.Name }}"
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+spec:
+  replicas: {{.Values.replicas}}
+  template: 
+    metadata: 
+      labels: 
+        app: "{{ .Chart.Name }}"
+    spec:
+      containers:
+      - name: "{{ .Chart.Name }}"
+        image: "{{.Values.image}}"
+        imagePullPolicy: "IfNotPresent"
+        ports:
+          - containerPort: 9090
+            protocol: "TCP"
+          - containerPort: 9797
+            protocol: "TCP"
+        # env:
+        #   - name: name
+        #     value: "{{.Values.env1}}"

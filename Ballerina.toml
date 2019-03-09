@@ -1,0 +1,4 @@
+[project]
+org-name = "Tim Schwalbe"
+version = "0.0.1"
+name = "Pushgateway"
