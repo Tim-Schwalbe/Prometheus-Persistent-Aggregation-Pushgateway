@@ -1,30 +1,52 @@
 import ballerina/io;
-public function readFile(string filePath) returns string | error? {
-    io:println("reading file!");
-    io:ReadableByteChannel byteChannel = io:openReadableFile(filePath);
-    io:ReadableCharacterChannel sourceChannel = new(io:openReadableFile(filePath), "UTF-8");
-    string content = check sourceChannel.read(10000);
-    closeRc(sourceChannel);
-    return content;
+public function readFile(string filePath) returns json | error? {
+    io:ReadableByteChannel rbc = io:openReadableFile(filePath);
+    io:ReadableCharacterChannel rch = new(rbc, "UTF8");
+    json | error result = rch.readJson();
+    if (result is error) {
+        closeRc(rch);
+        return result;
+    } else {
+        closeRc(rch);
+        return result;
+    }
 }
 
-public function writeFile(string filePath, string text) returns int | error? {
-    io:WritableCharacterChannel destinationChannel = new(io:openWritableFile(filePath, append = true), "UTF-8");
-    int writeCharResult = check destinationChannel.write(text, 0);
+public function writeFile(string filePath, json text) returns int | error? {
+
+    io:WritableCharacterChannel destinationChannel = new(io:openWritableFile(filePath), "UTF-8");
+    int writeCharResult = check destinationChannel.write(text.toString(), 0);
     closeWc(destinationChannel);
     return writeCharResult;
+
+    // io:WritableByteChannel wbc = io:openWritableFile(filePath);
+    // io:WritableCharacterChannel wch = new(wbc, "UTF8");
+    // var result = wch.writeJson({
+    
+    // });
+    // result = wch.writeJson(text);
+    // if (result is error) {
+    //     closeWc(wch);
+    //     return result;
+    // } else {
+    //     closeWc(wch);
+    //     return result;
+    // }
 }
 
-function closeRc(io:ReadableCharacterChannel ch) {
-    var cr = ch.close();
-    if (cr is error) {
-        log:printError("Error occured while closing the channel: ", err = cr);
+function closeRc(io:ReadableCharacterChannel rc) {
+    var result = rc.close();
+    if (result is error) {
+        log:printError("Error occurred while closing character stream",
+                        err = result);
     }
 }
 
-function closeWc(io:WritableCharacterChannel ch) {
-    var cr = ch.close();
-    if (cr is error) {
-        log:printError("Error occured while closing the channel: ", err = cr);
+function closeWc(io:WritableCharacterChannel wc) {
+    var result = wc.close();
+    if (result is error) {
+        log:printError("Error occurred while closing character stream",
+                        err = result);
     }
 }
+

@@ -1,4 +1,0 @@
-
-#help text
-# TYPE dialog_open_counter counter
-aaaaem_dialog_open_counter{test=t} 6
