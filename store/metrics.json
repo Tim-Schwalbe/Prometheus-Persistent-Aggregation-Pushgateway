@@ -1,1 +1,16 @@
-{"metrics":{"aaaaem_dialog_open_counter{test=\"test5\"}":{"help":"#Help help text", "type":"#TYPE dialog_open_counter counter", "metric":"aaaaem_dialog_open_counter{test=\"test5\"}", "value":"1"}}}6789"}}}
+{
+  "metrics": {
+    "aaaaem_dialog_open_counter{test=\"test\"}": {
+      "help": "#Help help text",
+      "type": "#TYPE dialog_open_counter counter",
+      "metric": "aaaaem_dialog_open_counter{test=\"test\"}",
+      "value": 531323342001
+    },
+    "dialog_open_counter{test=\"test\"}": {
+      "help": "#Help help text",
+      "type": "#TYPE dialog_open_counter counter",
+      "metric": "dialog_open_counter{test=\"test\"}",
+      "value": 100000000000
+    }
+  }
+}

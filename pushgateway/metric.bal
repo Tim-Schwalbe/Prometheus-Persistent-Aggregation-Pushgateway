@@ -41,8 +41,6 @@ public function addMetric(http:Request req) returns http:Response {
                 }, contentType = "application/json");
                 return res;
             }
-            
-
 
             string help = fullMetric[0].trim();
             string metricType = fullMetric[1].trim();
@@ -50,16 +48,32 @@ public function addMetric(http:Request req) returns http:Response {
             string metricSubstring = metric.substring(0, metric.lastIndexOf(" "));
             string metricValue = metric.substring(metric.lastIndexOf(" "), metric.length()).trim();
 
+            int | error actual = int.convert(metricsJson.metrics[metricSubstring].value);
+            int actualVerified;
+            if (actual is int) {
+                actualVerified = actual;
+            } else {
+                actualVerified = 0;
+            }
+            int addValueVerified;
+            int | error | () addValue = int.convert(metricValue);
+            if ( addValue is int ) {
+                addValueVerified = addValue;
+            } else {
+                addValueVerified = 0;
+            }
+            
             metricsJson.metrics[metricSubstring] = {
                 "help": help,
                 "type": metricType,
                 "metric": metricSubstring,
-                "value": metricValue
+                "value": actualVerified + addValueVerified
             };
+
 
             (        int | error | ()) writeMetricsJson = writeFile(metricStoreFile, metricsJson);
             res.statusCode = 200;
-            res.setJsonPayload("{metricsJson:ok}", contentType = "application/json");
+            res.setJsonPayload("{sucess:metric saved!}", contentType = "application/json");
             io:println(metricReq);
         } else {
             res.statusCode = 500;
