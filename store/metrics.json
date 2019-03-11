@@ -1,16 +1,25 @@
 {
   "metrics": {
-    "aaaaem_dialog_open_counter{test=\"test\"}": {
+    "dialog_open_counter{test=\"test\", hello=\"ugug\"}": {
       "help": "#Help help text",
-      "type": "#TYPE dialog_open_counter counter",
-      "metric": "aaaaem_dialog_open_counter{test=\"test\"}",
-      "value": 531323342001
+      "metricType": "#TYPE dialog_open_counter counter",
+      "metricName": "dialog_open_counter{test=\"test\", hello=\"ugug\"}",
+      "labels": "test=\"test\", hello=\"ugug\"",
+      "value": 1
     },
-    "dialog_open_counter{test=\"test\"}": {
+    "dialog_open_counter{test=\"test\", hello=\"ugugoidjocdjocj\"}": {
       "help": "#Help help text",
-      "type": "#TYPE dialog_open_counter counter",
-      "metric": "dialog_open_counter{test=\"test\"}",
-      "value": 100000000000
+      "metricType": "#TYPE dialog_open_counter counter",
+      "metricName": "dialog_open_counter{test=\"test\", hello=\"ugugoidjocdjocj\"}",
+      "labels": "test=\"test\", hello=\"ugugoidjocdjocj\"",
+      "value": 1
+    },
+    "dialog_open_counter{test=\"test\", neu=\"okok\"}": {
+      "help": "#Help help text",
+      "metricType": "#TYPE dialog_open_counter counter",
+      "metricName": "dialog_open_counter{test=\"test\", neu=\"okok\"}",
+      "labels": "test=\"test\", neu=\"okok\"",
+      "value": 1
     }
   }
 }
