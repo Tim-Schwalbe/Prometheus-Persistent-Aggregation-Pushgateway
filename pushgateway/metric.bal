@@ -12,20 +12,6 @@ map<observe:Counter> publishedMetricMap = {
 
 };
 
-// listener file:Listener localFolder = new ({
-//     path: "store/",
-//     recursive: false
-// });
-// service fileSystem on localFolder {
-//     resource function onCreate(file:FileEvent m) {
-//         io:println("file created!");
-//     }
-//     resource function onModify(file:FileEvent m) {
-//         io:println("file modified!");
-//         metricsJson = untaint readFile(metricStoreFile);
-//     }
-// }
-
 public function addMetric(http:Request req) returns http:Response {
 
     http:Response res = new;
@@ -49,8 +35,8 @@ public function addMetric(http:Request req) returns http:Response {
             string metricType = fullMetric[1].trim();
             string metric = fullMetric[2].trim();
             string metricWithLabels = metric.substring(0, metric.lastIndexOf(" "));
-            string metricName = metric.substring(0, metric.lastIndexOf("}") + 1);
-            string labels = metric.substring(metric.indexOf("{") + 1, metric.lastIndexOf("}"));
+            string metricName = metricWithLabels.substring(0, metricWithLabels.indexOf("{")).trim();
+            string labels = metricWithLabels.substring(metric.indexOf("{") + 1, metricWithLabels.lastIndexOf("}")).trim();
             string metricValue = metric.substring(metric.lastIndexOf(" "), metric.length()).trim();
 
             int | error actual = int.convert(metricsJson.metrics[metricWithLabels].value);
@@ -78,7 +64,7 @@ public function addMetric(http:Request req) returns http:Response {
 
             (        int | error | ()) writeMetricsJson = writeFile(metricStoreFile, metricsJson);
 
-            publishMetric(help, metricType, metricWithLabels, metricName, labels, newValue);
+            publishMetric(help, metricType, metricWithLabels, metricName, labels, addValueVerified);
 
             res.statusCode = 200;
             res.setJsonPayload("{sucess:metric saved!}", contentType = "application/json");
@@ -116,13 +102,13 @@ function publishMetric(string help, string metricType, string metricWithLabels, 
     string[] labelArray = labels.split(",");
     foreach string item in labelArray {
         string[] tag = item.split("=");
-        string key = tag[0];
-        string value = tag[1].replace("\"", "");
+        string key = tag[0].trim();
+        string value = tag[1].replace("\"", "").trim();
          labelsMap[key] = value;
     }
     observe:Counter | () registeredCounter = publishedMetricMap[metricWithLabels];
     if (registeredCounter is ()) {
-        observe:Counter newRegisteredCounter = new observe:Counter(metricName,desc =help, tags = labelsMap);
+        observe:Counter newRegisteredCounter = new observe:Counter(metricName,desc = help, tags = labelsMap);
         _ = newRegisteredCounter.register();
         newRegisteredCounter.increment(amount = newValue);
         publishedMetricMap[metricWithLabels] = newRegisteredCounter;
@@ -135,12 +121,13 @@ function publishMetric(string help, string metricType, string metricWithLabels, 
 
 
 function publishAllMetrics() {
+    string metricWithLabel = "";
     string help = "";
     string metricType = "";
     string labels = "";
     string metricName = "";
-  
-    int|error metricValue;
+
+    int | error metricValue;
 
     if (metricsJson is json) {
 
@@ -148,14 +135,16 @@ function publishAllMetrics() {
             int i = 0;
             string[] keys = metricsJson.metrics.getKeys();
             while (i < metricsJson.metrics.length()) {
-                io:println(keys[i]);
-                json singleMetric = metricsJson.metrics[keys[i]];
+                string metricWithLabels =keys[i];
+                json singleMetric = metricsJson.metrics[metricWithLabels];
                 help = singleMetric.help.toString();
                 metricType = singleMetric.metricType.toString();
                 metricName = singleMetric.metricName.toString();
                 labels = singleMetric.labels.toString();
-                metricValue = int.convert(singleMetric.value);
-
+                metricValue =int.convert(singleMetric.value);
+                if(metricValue is int){
+                publishMetric(help, metricType, metricWithLabels, metricName, labels, metricValue);
+                }
                 i = i + 1;
             }
 
