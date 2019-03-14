@@ -1,1 +1,18 @@
-{"metrics":{"dialog_open_counter{test=\"test\", neu=\"okok\"}":{"help":"#Help help text", "metricType":"#TYPE dialog_open_counter counter", "metricName":"dialog_open_counter", "labels":"test=\"test\", neu=\"okok\"", "value":46}}}
+{
+  "metrics": {
+    "dialog_open_counter{test=\"test3\", neu=\"okok\"}": {
+      "help": "#Help help text",
+      "metricType": "#TYPE dialog_open_counter counter",
+      "metricName": "dialog_open_counter",
+      "labels": "test=\"test3\", neu=\"okok\"",
+      "value": 3
+    },
+    "dialog_open_counter{test=\"testok\", neu=\"okok\"}": {
+      "help": "#Help help text",
+      "metricType": "#TYPE dialog_open_counter counter",
+      "metricName": "dialog_open_counter",
+      "labels": "test=\"testok\", neu=\"okok\"",
+      "value": 1
+    }
+  }
+}

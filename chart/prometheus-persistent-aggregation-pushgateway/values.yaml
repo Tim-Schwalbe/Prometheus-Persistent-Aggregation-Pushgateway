@@ -1,0 +1,4 @@
+host: 
+tlsSecretName: prometheus-persistent-pushgateway
+image: tschwalbe/prometheus-persistent-aggregation-pushgateway:0.0.1
+storage: 10G

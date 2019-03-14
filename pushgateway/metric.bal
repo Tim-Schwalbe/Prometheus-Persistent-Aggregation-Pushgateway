@@ -21,12 +21,12 @@ public function addMetric(http:Request req) returns http:Response {
 
     if (metricReq is string) {
         if (metricsJson is json) {
-
-            string[] fullMetric = metricReq.split(";");
+            string linebreaksReplacedMetric = metricReq.replace("\\n", ";");
+            string[] fullMetric = linebreaksReplacedMetric.split(";");
             if (fullMetric.length() < 3) {
                 res.statusCode = 500;
                 res.setJsonPayload({
-                    "error": "Please use following format:'#HELP help text;#TYPE metricname <gauge|counter>; metricname <value>"
+                    "error": "Please use following format:'#HELP help text\n#TYPE metricname <gauge|counter>\nmetricname <value>"
                 }, contentType = "application/json");
                 return res;
             }
@@ -53,6 +53,15 @@ public function addMetric(http:Request req) returns http:Response {
             } else {
                 addValueVerified = 0;
             }
+
+            if (addValueVerified < 1) {
+                res.statusCode = 500;
+                res.setJsonPayload({
+                    "error": "Value could not be parsed or Value is < 1"
+                }, contentType = "application/json");
+                return res;
+            }
+
             int newValue = actualVerified + addValueVerified;
             metricsJson.metrics[metricWithLabels] = {
                 "help": help,
@@ -68,11 +77,10 @@ public function addMetric(http:Request req) returns http:Response {
 
             res.statusCode = 200;
             res.setJsonPayload("{sucess:metric saved!}", contentType = "application/json");
-            io:println(metricReq);
         } else {
             res.statusCode = 500;
             res.setJsonPayload({
-                "error": "bad request!"
+                "error": "bad request or metrics.json corrupt!"
             }, contentType = "application/json");
         }
 
@@ -86,8 +94,16 @@ public function addMetric(http:Request req) returns http:Response {
 
     return res;
 }
-public function main() returns int {
+public
+function main() returns int {
     io:println("Pushgateway started!");
+    internal:Path deleteFilePath = new(metricStoreFile);
+    if (!deleteFilePath.exists()) {
+        _ = deleteFilePath.createFile();
+        _ = writeFile(metricStoreFile, {
+
+        });
+    }
     metricsJson = untaint readFile(metricStoreFile);
     publishAllMetrics();
     return 0;
@@ -119,7 +135,6 @@ function publishMetric(string help, string metricType, string metricWithLabels, 
 
 }
 
-
 function publishAllMetrics() {
     string metricWithLabel = "";
     string help = "";
@@ -142,8 +157,8 @@ function publishAllMetrics() {
                 metricName = singleMetric.metricName.toString();
                 labels = singleMetric.labels.toString();
                 metricValue =int.convert(singleMetric.value);
-                if(metricValue is int){
-                publishMetric(help, metricType, metricWithLabels, metricName, labels, metricValue);
+                if (metricValue is int) {
+                    publishMetric(help, metricType, metricWithLabels, metricName, labels, metricValue);
                 }
                 i = i + 1;
             }

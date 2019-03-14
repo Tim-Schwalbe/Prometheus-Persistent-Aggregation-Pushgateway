@@ -14,6 +14,13 @@ spec:
       labels: 
         app: "{{ .Chart.Name }}"
     spec:
+      initContainers:
+      - name: volume-mount-hack
+        image: busybox
+        command: ["sh", "-c", "chown -R 100:100 /home/ballerina/store"]
+        volumeMounts:
+        - name: "datadir"
+          mountPath: "/home/ballerina/store"
       containers:
       - name: "{{ .Chart.Name }}"
         image: "{{.Values.image}}"
@@ -23,6 +30,10 @@ spec:
             protocol: "TCP"
           - containerPort: 9797
             protocol: "TCP"
-        # env:
-        #   - name: name
-        #     value: "{{.Values.env1}}"
+        volumeMounts:
+        - name: "datadir"
+          mountPath: "/home/ballerina/store"
+      volumes:
+      - name: "datadir"
+        persistentVolumeClaim:
+          claimName: "prometheus-persistent-aggregation-pushgateway"
